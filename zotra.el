@@ -208,10 +208,16 @@ if ENTR_FORMAT is nil."
            (user-error "An error occurred during translation"))
           (t entry))))
 
+(defun swh-zotra-add-apostrophes (json)
+"Hack to fix parsing of apostrophe's in JSON string, use in conjunction with `swh-zotra-romove-apostrophes` before sending to `zotra-get-entry-from-json`"
+(replace-regexp-in-string "@@replacewithapostrophe@@" "'" json))
+
+(defun swh-zotra-remove-apostrophes (json)
+"Hack to fix parsing of apostrophe's in JSON string, use in conjunction with `swh-zotra-add-apostrophes` at end"
+(replace-regexp-in-string "'" "@@replacewithapostrophe@@" json))
 
 (defun zotra-get-entry (url-or-search-string &optional is-search entry-format)
-  (zotra-get-entry-from-json (zotra-get-json url-or-search-string is-search) entry-format))
-
+  (swh-zotra-remove-apostrophes (zotra-get-entry-from-json (swh-zotra-remove-apostrophes (zotra-get-json url-or-search-string is-search)) entry-format)))
 
 (defun zotra-add-entry (url-or-search-string &optional is-search bibfile entry-format)
   (let ((bibfile
